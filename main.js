@@ -41,7 +41,6 @@ acode.setPluginInit(PLUGIN_ID, async (baseUrl) => {
 	registration = fileIcons.register({
 		id: PLUGIN_ID,
 		name: "Icon Pack Example",
-		pluginId: PLUGIN_ID,
 		icons: `${Url.join(baseUrl, "icons")}/`,
 		...mapsFromPack(files, folders),
 		folder: "folder",

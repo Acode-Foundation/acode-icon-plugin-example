@@ -16,9 +16,11 @@ Requires an Acode build that includes the `fileIcons` plugin API.
 
 ## How it works
 
-The plugin reads bundled JSON maps through `acode.require("fs")`, converts them into top-level associations, and registers them with its `pluginId`. Image URLs use the initialization callback's `baseUrl`. Expanded folder icons are declared explicitly. Acode handles matching, loading, and fallback.
+Capture `acode.require("fileIcons")` at the top of `main.js`, before any `await`. The loader binds that API to this plugin. After an `await`, `require("fileIcons")` has no executing main-script context and throws. You can also take `fileIcons` from the third initialization argument: `(baseUrl, page, { fileIcons })`.
 
-Registration does not change the selected pack. The returned registration is disposed on unmount; Acode also cleans up packs by their owning plugin ID.
+The plugin reads bundled JSON maps through `acode.require("fs")`, converts them into top-level associations, and registers the pack. Image URLs use the initialization callback's `baseUrl`. Expanded folder icons are declared explicitly. Acode supplies pack ownership from the loading plugin; do not pass `pluginId`. If you do, it must match this plugin's id.
+
+Registration does not change the selected pack. The returned registration is disposed on unmount; Acode also removes packs owned by the plugin when it unmounts.
 
 Use `register` again with the complete pack to replace it. There is no separate update or unregister method in the plugin API.
 
@@ -34,7 +36,6 @@ acode.setPluginInit(plugin.id, async (baseUrl) => {
 
   registration = fileIcons.register({
     id: plugin.id,
-    pluginId: plugin.id,
     name: "Icon Pack Example",
     icons: `${Url.join(baseUrl, "icons")}/`,
     ...mapsFromPack(files, folders),
@@ -75,5 +76,5 @@ cp plugin.zip material-icons.zip
 
 1. Change `id`, `name`, and author in `plugin.json` and `main.js`.
 2. Swap `icons/` and the JSON maps, or register associations inline.
-3. Keep `pluginId` equal to the plugin id so Acode can clean up on unmount.
+3. Capture `acode.require("fileIcons")` at the top of `main.js`, or use `options.fileIcons` in `setPluginInit`. Omit `pluginId`; Acode binds ownership to the loading plugin.
 4. Rebuild `plugin.zip` and install it locally.
